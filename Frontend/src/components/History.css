@@ -1,0 +1,76 @@
+
+.history-scroll {
+  flex: 1;
+  overflow-y: auto;
+  padding: 12px 12px 90px;
+}
+
+.history-scroll--desktop {
+  padding: 24px 32px;
+}
+
+.history-card__date {
+  font-size: 11px;
+  color: var(--c-muted);
+  font-weight: 600;
+  margin-bottom: 10px;
+  letter-spacing: 0.3px;
+}
+
+.history-card__team-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 8px;
+}
+
+.history-card__team-row:first-of-type {
+  margin-top: 0;
+}
+
+.history-card__team-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.history-card__team-name {
+  font-weight: 700;
+  font-size: 14px;
+}
+
+.history-card__score {
+  font-weight: 800;
+  font-size: 15px;
+}
+
+.history-card__score-overs {
+  font-weight: 400;
+  font-size: 12px;
+  color: var(--c-muted);
+}
+
+.history-card__status {
+  margin-top: 10px;
+  font-size: 13px;
+  color: var(--c-primary);
+  font-weight: 600;
+}
+
+.history-card__actions {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+  border-top: 1px solid var(--c-border);
+  padding-top: 10px;
+  margin-top: 10px;
+}
+
+.history-card__delete {
+  background: none;
+  border: none;
+  color: var(--c-faint);
+  font-size: 16px;
+  cursor: pointer;
+  margin-left: auto;
+}

@@ -1,0 +1,255 @@
+/* ═══════════════════════════════════════════════════════
+   styles/components.css — Reusable component classes
+   Theme: Violet / Lavender
+   ═══════════════════════════════════════════════════════ */
+
+/* ── CARD ── */
+.card {
+  background: var(--c-card);
+  border-radius: var(--r-lg);
+  padding: var(--gap-lg);
+  margin-bottom: var(--gap-md);
+  box-shadow: var(--shadow-md);
+  overflow: hidden;
+}
+
+.card--flush  { padding: 0; }
+
+.card--active {
+  border-left: 4px solid var(--c-primary);
+  background: var(--c-primary-pale);
+}
+
+/* ── SECTION TITLE ── */
+.sec-title {
+  font-size: 11px;
+  font-weight: 800;
+  color: var(--c-primary);
+  margin-bottom: 10px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+/* ── CRIC TABLE ── */
+.cric-table { width: 100%; border-collapse: collapse; }
+
+.cric-table thead tr { background: #faf9ff; }
+
+.cric-table th {
+  padding: 7px 6px;
+  font-size: 11px;
+  color: var(--c-muted);
+  text-align: left;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+}
+
+.cric-table td {
+  padding: 8px 6px;
+  font-size: 13px;
+  border-bottom: 1px solid #f5f2ff;
+}
+
+.cric-table tbody tr:nth-child(even) { background: #faf9ff; }
+.cric-table tbody tr.row-active      { background: var(--c-primary-pale); }
+
+/* ── PLAYER NAME CELL ── */
+.player-name          { font-weight: 700; color: var(--c-primary); font-size: 13px; }
+.player-name--out     { font-weight: 400; color: var(--c-faint); text-decoration: line-through; }
+.player-how-out       { font-size: 10px; color: var(--c-faint); margin-top: 1px; }
+
+/* ── STATUS BADGE ── */
+.status-badge         { font-size: 10px; font-weight: 700; padding: 2px 7px; border-radius: var(--r-sm); }
+.status-badge--batting{ background: var(--c-primary-pale); color: var(--c-primary); }
+.status-badge--out    { background: #fdecea; color: var(--c-red); }
+.status-badge--dnb    { background: #f5f2ff; color: var(--c-faint); }
+
+/* ── BALL BUBBLE ── */
+.ball {
+  width: 32px;
+  height: 32px;
+  border-radius: var(--r-full);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11.5px;
+  font-weight: 800;
+  flex-shrink: 0;
+}
+
+.ball--sm { width: 26px; height: 26px; font-size: 10px; }
+.ball--lg { width: 38px; height: 38px; font-size: 13px; }
+
+.ball--dot  { background: var(--ball-dot-bg);  color: var(--ball-dot-text); }
+.ball--four { background: var(--ball-4-bg);    color: #fff; }
+.ball--six  { background: var(--ball-6-bg);    color: #fff; }
+.ball--wkt  { background: var(--ball-w-bg);    color: #fff; }
+.ball--ext  { background: var(--ball-ex-bg);   color: #fff; }
+
+/* ── TEAM BADGE ── */
+.team-badge {
+  width: 36px;
+  height: 36px;
+  border-radius: var(--r-full);
+  background: var(--c-primary);
+  color: var(--c-white);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  font-weight: 800;
+  flex-shrink: 0;
+}
+
+.team-badge--sm   { width: 30px; height: 30px; font-size: 10px; }
+.team-badge--lg   { width: 44px; height: 44px; font-size: 14px; }
+.team-badge--dark { background: var(--c-primary-dark); }
+
+/* ── BUTTONS ── */
+.btn-green {
+  background: linear-gradient(135deg, var(--c-primary-dark), var(--c-primary));
+  color: var(--c-white);
+  border: none;
+  border-radius: var(--r-md);
+  padding: 11px 18px;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  font-family: inherit;
+  transition: opacity 0.15s;
+}
+
+.btn-green--full  { width: 100%; }
+.btn-green--sm    { padding: 9px 14px; font-size: 13px; }
+.btn-green--ghost { background: rgba(255,255,255,0.2); }
+
+.btn-outline {
+  background: #f7f4ff;
+  border: 1px solid var(--c-border);
+  border-radius: var(--r-md);
+  padding: 9px 16px;
+  font-size: 13px;
+  color: var(--c-primary);
+  cursor: pointer;
+  font-weight: 600;
+  font-family: inherit;
+}
+
+.btn-link {
+  background: none;
+  border: none;
+  color: var(--c-primary);
+  font-weight: 700;
+  font-size: 13px;
+  cursor: pointer;
+  font-family: inherit;
+  padding: 0;
+}
+
+/* ── RUN BUTTON ── */
+.btn-run {
+  background: var(--c-white);
+  border: 2.5px solid var(--c-primary);
+  border-radius: var(--r-full);
+  width: 100%;
+  aspect-ratio: 1;
+  font-size: 17px;
+  font-weight: 800;
+  color: var(--c-primary);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 8px rgba(92,53,196,0.15);
+  transition: all 0.15s;
+  font-family: inherit;
+}
+
+.btn-run.active,
+.btn-run:active {
+  background: var(--c-primary);
+  color: var(--c-white);
+}
+
+/* ── RUN PAD GRID ── */
+.run-pad             { display: flex; gap: var(--gap-lg); align-items: flex-start; }
+.run-pad__actions    { display: flex; flex-direction: column; gap: var(--gap-sm); flex-shrink: 0; }
+.run-pad__grid       { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; flex: 1; }
+
+/* ── FORM FIELDS ── */
+.form-label {
+  display: block;
+  color: var(--c-primary);
+  font-weight: 700;
+  font-size: 12px;
+  letter-spacing: 0.8px;
+  text-transform: uppercase;
+  margin-bottom: 4px;
+  margin-top: 16px;
+  padding: 0 2px;
+}
+
+.form-input {
+  width: 100%;
+  border: none;
+  border-bottom: 2px solid var(--c-border);
+  padding: 8px 0;
+  font-size: 15px;
+  background: none;
+  outline: none;
+  color: var(--c-text);
+  transition: border-color 0.2s;
+  font-family: inherit;
+}
+
+.form-input + .form-input { margin-top: 10px; }
+
+.form-radio-label {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 7px 0;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+/* ── EXTRAS CHECKBOXES ── */
+.extras-row           { display: flex; flex-wrap: wrap; gap: var(--gap-md); margin-bottom: var(--gap-md); }
+
+.extras-check         { display: flex; align-items: center; gap: 5px; font-size: 13px; cursor: pointer; font-weight: 400; color: #555; transition: color 0.15s; }
+.extras-check.checked { font-weight: 700; color: var(--c-primary); }
+
+/* ── ACTION ROW ── */
+.action-row            { display: flex; gap: var(--gap-sm); }
+.action-row .btn-outline{ flex: 1; }
+
+/* ── OVER BALLS ROW ── */
+.balls-row { display: flex; gap: 7px; flex-wrap: wrap; }
+
+/* ── LIVE BADGE ── */
+.live-badge {
+  background: var(--c-red);
+  color: var(--c-white);
+  border-radius: 4px;
+  padding: 1px 5px;
+  font-size: 9px;
+  font-weight: 700;
+  margin-left: 5px;
+  animation: pulseLive 1.4s ease-in-out infinite;
+}
+
+/* ── EMPTY STATE ── */
+.empty-state         { text-align: center; color: var(--c-muted); padding: 60px 20px; }
+.empty-state__icon   { font-size: 56px; display: block; margin-bottom: 12px; }
+.empty-state__title  { font-size: 16px; font-weight: 700; margin-bottom: 4px; }
+.empty-state__sub    { font-size: 13px; }
+
+/* ── DIVIDER ── */
+.divider { border: none; border-top: 1px solid var(--c-border); margin: var(--gap-sm) 0; }
+
+/* ── PERFORMER ROW ── */
+.performer-grid              { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.performer-col__label        { font-size: 11px; color: var(--c-muted); font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px; }
+.performer-row               { display: flex; justify-content: space-between; font-size: 13px; padding: 3px 0; border-bottom: 1px dashed var(--c-border); }
+.performer-row__val          { font-weight: 700; color: var(--c-primary); }

@@ -1,0 +1,109 @@
+
+
+/* ── CSS Variables ──────────────────────────────────── */
+:root {
+  /* ── Primary brand (violet / indigo) ── */
+  --c-primary:        #5c35c4;
+  --c-primary-dark:   #3b1f8c;
+  --c-primary-mid:    #7c55d4;
+  --c-primary-light:  #9b7fe0;
+  --c-primary-pale:   #ede8fb;
+  --c-primary-bg:     #f3f0ff;
+  --c-primary-faint:  #d0c4f5;
+
+  /* ── Keep green aliases for backward compat ── */
+  --c-green:        #5c35c4;
+  --c-green-dark:   #3b1f8c;
+  --c-green-light:  #9b7fe0;
+  --c-green-pale:   #ede8fb;
+  --c-green-bg:     #f3f0ff;
+  --c-green-faint:  #d0c4f5;
+
+  /* ── Neutrals ── */
+  --c-white:   #ffffff;
+  --c-bg:      #f0eeff;
+  --c-card:    #ffffff;
+  --c-border:  #e4ddf7;
+  --c-text:    #1a1530;
+  --c-muted:   #7065a0;
+  --c-faint:   #c4b8e8;
+
+  /* ── Accents ── */
+  --c-red:     #ef5350;
+  --c-orange:  #f57c00;
+  --c-teal:    #00bcd4;
+
+  /* ── Ball colours ── */
+  --ball-6-bg:     #5c35c4;
+  --ball-4-bg:     #f57c00;
+  --ball-w-bg:     #ef5350;
+  --ball-ex-bg:    #9c27b0;
+  --ball-dot-bg:   #ede8fb;
+  --ball-dot-text: #5c35c4;
+
+  /* ── Typography ── */
+  --font-main: 'DM Sans', 'Segoe UI', sans-serif;
+
+  /* ── Spacing ── */
+  --gap-xs:  4px;
+  --gap-sm:  8px;
+  --gap-md:  12px;
+  --gap-lg:  16px;
+  --gap-xl:  24px;
+  --gap-xxl: 32px;
+
+  /* ── Radius ── */
+  --r-sm:   8px;
+  --r-md:   12px;
+  --r-lg:   16px;
+  --r-xl:   20px;
+  --r-full: 50%;
+
+  /* ── Shadows (violet tint) ── */
+  --shadow-sm:      0 1px 4px rgba(92, 53, 196, 0.08);
+  --shadow-md:      0 2px 12px rgba(92, 53, 196, 0.10);
+  --shadow-lg:      0 4px 24px rgba(92, 53, 196, 0.14);
+  --shadow-sidebar: 4px 0 24px rgba(59, 31, 140, 0.25);
+}
+
+/* ── Reset ──────────────────────────────────────────── */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html, body, #root {
+  height: 100%;
+  width: 100%;
+}
+
+body {
+  font-family: var(--font-main);
+  background: var(--c-bg);
+  color: var(--c-text);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+button { font-family: inherit; cursor: pointer; }
+button:hover { opacity: 0.88; }
+input, textarea { font-family: inherit; }
+
+/* ── Scrollbar ── */
+::-webkit-scrollbar       { width: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--c-primary-faint); border-radius: 4px; }
+
+/* ── Focus ── */
+input:focus { border-bottom-color: var(--c-primary) !important; outline: none; }
+
+/* ── Animations ── */
+@keyframes popIn    { from { transform: scale(0.7); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+@keyframes slideUp  { from { transform: translateY(12px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+@keyframes fadeIn   { from { opacity: 0; } to { opacity: 1; } }
+@keyframes pulseLive{ 0%, 100% { opacity: 1; } 50% { opacity: 0.55; } }
+
+.anim-pop   { animation: popIn   0.25s cubic-bezier(.34,1.56,.64,1) both; }
+.anim-slide { animation: slideUp 0.3s ease both; }
+.anim-fade  { animation: fadeIn  0.25s ease both; }

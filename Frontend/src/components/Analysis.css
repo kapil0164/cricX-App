@@ -1,0 +1,77 @@
+/* ── Chart container ────────────────────────────────── */
+.chart-card { padding: 14px; }
+.chart-svg  { display: block; overflow: visible; width: 100%; }
+
+.chart-legend {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+  margin-top: 10px;
+}
+.chart-legend__item        { font-size: 13px; font-weight: 700; }
+.chart-legend__item--t1    { color: var(--c-teal); }
+.chart-legend__item--t2    { color: var(--c-primary); }
+.chart-x-label             { text-align: center; font-size: 11px; color: var(--c-muted); margin-top: 4px; }
+
+/* ── Summary card ───────────────────────────────────── */
+.summary-row               { padding: 8px 0; border-bottom: 1px solid var(--c-border); }
+.summary-row:last-child    { border-bottom: none; }
+.summary-row__team         { font-weight: 800; color: var(--c-primary); margin-bottom: 3px; font-size: 14px; }
+.summary-row__stats        { font-size: 13px; color: #555; }
+
+/* ── Result banner ──────────────────────────────────── */
+.analysis-result-banner {
+  background: linear-gradient(135deg, #3b1f8c, #5c35c4);
+  color: #fff;
+  border-radius: var(--r-md);
+  padding: 10px 16px;
+  font-size: 13px;
+  font-weight: 700;
+  margin-bottom: 12px;
+}
+
+/* ── Match picker ───────────────────────────────────── */
+.analysis-picker {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 4px;
+}
+
+.analysis-picker__btn {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: var(--c-card);
+  border: 1.5px solid var(--c-border);
+  border-radius: var(--r-md);
+  padding: 10px 12px;
+  cursor: pointer;
+  text-align: left;
+  transition: border-color 0.2s, background 0.2s;
+  font-family: inherit;
+  width: 100%;
+}
+.analysis-picker__btn:hover      { border-color: var(--c-primary-light); background: var(--c-primary-bg); }
+.analysis-picker__btn.active     { border-color: var(--c-primary); background: var(--c-primary-pale); }
+.analysis-picker__icon           { font-size: 18px; flex-shrink: 0; }
+.analysis-picker__label          { font-size: 13px; font-weight: 700; color: var(--c-text); }
+.analysis-picker__sub            { font-size: 11px; color: var(--c-muted); margin-top: 2px; }
+.analysis-picker__empty          { font-size: 12px; color: var(--c-faint); padding: 8px 4px; }
+
+/* ── Desktop layout ─────────────────────────────────── */
+.analysis-layout                 { padding: 24px 32px; flex: 1; overflow-y: auto; }
+.analysis-layout--mobile         { padding: 12px 12px 90px; flex: 1; overflow-y: auto; }
+
+.analysis-desktop-layout {
+  display: flex;
+  gap: 24px;
+  align-items: flex-start;
+}
+.analysis-desktop-sidebar {
+  width: 240px;
+  flex-shrink: 0;
+  position: sticky;
+  top: 0;
+}
+.analysis-desktop-main           { flex: 1; min-width: 0; }

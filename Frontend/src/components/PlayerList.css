@@ -1,0 +1,48 @@
+/* ─── PLAYER LIST ────────────────────────────────────────────── */
+.player-list__active {
+  background: var(--green-pale) !important;
+}
+
+.player-list__num {
+  color: var(--text-muted);
+  font-size: 12px;
+  width: 20px;
+}
+
+.player-list__name {
+  font-weight: 600;
+  color: var(--green-main);
+}
+
+.player-list__name.out {
+  color: var(--text-muted);
+  font-weight: 400;
+}
+
+.player-list__how-out {
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+/* ── Status badge ── */
+.player-list__status {
+  font-size: 11px;
+  font-weight: 600;
+  padding: 2px 6px;
+  border-radius: var(--radius-sm);
+}
+
+.player-list__status.batting {
+  background: var(--green-pale);
+  color: var(--green-main);
+}
+
+.player-list__status.out {
+  background: #fdecea;
+  color: var(--red);
+}
+
+.player-list__status.dnb {
+  background: #f0f0f0;
+  color: var(--text-muted);
+}

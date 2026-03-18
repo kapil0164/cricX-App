@@ -1,0 +1,34 @@
+
+
+.overs-list {
+  padding-top: 4px;
+}
+
+.over-card__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.over-card__num {
+  font-weight: 800;
+  font-size: 14px;
+}
+
+.over-card__num-tag {
+  font-size: 11px;
+  color: var(--c-muted);
+  font-weight: 400;
+  margin-left: 4px;
+}
+
+.over-card__runs {
+  font-size: 13px;
+  color: var(--c-muted);
+  font-weight: 600;
+}
+
+.over-card--live {
+  border-left: 4px solid var(--c-primary);
+}
