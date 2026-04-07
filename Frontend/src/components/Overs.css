@@ -4,7 +4,7 @@
   padding-top: 4px;
 }
 
-.over-card__header {
+.over-card__header {  
   display: flex;
   justify-content: space-between;
   align-items: center;
