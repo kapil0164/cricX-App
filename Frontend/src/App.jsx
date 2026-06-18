@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import "./App.css";
 import "./styles/components.css";
 
@@ -30,6 +30,33 @@ const NAV_ITEMS = [
 
 function IconBtn({ children, onClick }) {
   return <button className="icon-btn" onClick={onClick}>{children}</button>;
+}
+
+function NotificationsDropdown({ visible, history = [], onClose, onResume, onOpenHistory }) {
+  if (!visible) return null;
+  return (
+    <div className="notif-dropdown" onClick={e => e.stopPropagation()}>
+      <div className="notif-dropdown__header">Notifications</div>
+      <div className="notif-dropdown__list">
+        {history.length === 0 && <div className="notif-empty">No notifications</div>}
+        {history.map((h, i) => (
+          <div key={i} className="notif-item">
+            <div className="notif-item__left">
+              <div className="team-badge team-badge--sm">{(h.team1||'T1').slice(0,2).toUpperCase()}</div>
+            </div>
+            <div className="notif-item__body">
+              <div className="notif-item__title">{h.team1} vs {h.team2}</div>
+              <div className="notif-item__meta">{h.date} · {h.time} · {h.status || 'Saved'}</div>
+            </div>
+            <div className="notif-item__actions">
+              <button className="btn-link" onClick={() => { onResume && onResume(h); onClose(); }}>Resume</button>
+              <button className="btn-link" onClick={() => { onOpenHistory && onOpenHistory(); onClose(); }}>Open</button>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
 }
 
 /* ══════════════════════════════════════════════════════
@@ -201,11 +228,67 @@ function HistoryScoreboardModal({ match, onClose }) {
   );
 }
 
+function ResultBanner({ mobile = false, matchEnded, screen, matchStatus }) {
+  return matchEnded && screen === "match"
+    ? <div className={`result-banner${mobile ? " result-banner--mobile" : ""}`}>🏆 {matchStatus}</div>
+    : null;
+}
+
+function Modal({ scoreboardMatch, onClose }) {
+  return scoreboardMatch ? <HistoryScoreboardModal match={scoreboardMatch} onClose={onClose} /> : null;
+}
+
+function LiveStatsOverlay({ showLiveStats, innings, inn1BatName, inn1BowlName, inn2BatName, inn2BowlName, inn2Started, onClose }) {
+  return showLiveStats ? (
+    <LiveStatsModal
+      innings={innings}
+      inn1BatName={inn1BatName}
+      inn1BowlName={inn1BowlName}
+      inn2BatName={inn2BatName}
+      inn2BowlName={inn2BowlName}
+      inn2Started={inn2Started}
+      onClose={onClose}
+    />
+  ) : null;
+}
+
+function UserBadge({ currentUser, onSignOut, history = [], onResume, onOpenHistory }) {
+  const savedCount = history.length;
+  const inProgressCount = history.filter(h => h.status && h.status.toLowerCase().includes("in progress")).length;
+
+  return (
+    <div style={{ display:"flex", alignItems:"center", gap:10, position:"relative" }}>
+      {/* Notification bell */}
+      <div style={{ position:"relative" }}>
+        <button className="icon-btn notif-bell" onClick={(e) => { e.stopPropagation(); const ev = new CustomEvent('toggle-notifs'); window.dispatchEvent(ev); }} title="Notifications">🔔</button>
+        {savedCount > 0 && <div className="notif-badge">{savedCount}</div>}
+      </div>
+
+      <div style={{
+        width:32, height:32, borderRadius:"50%",
+        background:"linear-gradient(135deg,#7c3aed,#a78bfa)",
+        display:"flex", alignItems:"center", justifyContent:"center",
+        color:"#fff", fontSize:12, fontWeight:800, flexShrink:0,
+      }}>{currentUser.avatar || currentUser.name.slice(0,2).toUpperCase()}</div>
+      <button
+        onClick={onSignOut}
+        style={{
+          background:"rgba(239,68,68,0.15)", border:"1px solid rgba(239,68,68,0.3)",
+          color:"#fca5a5", borderRadius:8, padding:"5px 12px",
+          fontSize:12, fontWeight:700, cursor:"pointer",
+        }}
+      >Sign Out</button>
+
+      {/* Dropdown is mounted at App level via event — placeholder here for accessibility */}
+    </div>
+  );
+}
+
 /* ══════════════════════════════════════════════════════
    APP
 ══════════════════════════════════════════════════════ */
 export default function App() {
-  const { isMobile, isTablet, isDesktop } = useWindowSize();
+  const { isTablet, isDesktop } = useWindowSize();
 
   const [screen, setScreen]     = useState("home");
   const [matchTab, setMatchTab] = useState("scoreboard");
@@ -229,8 +312,20 @@ export default function App() {
   const [currentUser, setCurrentUser]   = useState(null);
   const [authLoading, setAuthLoading]   = useState(true);
   const [showLiveStats, setShowLiveStats] = useState(false);
+  const [showNotifications, setShowNotifications] = useState(false);
   const [currentMatchId, setCurrentMatchId] = useState(null);
   const [history, setHistory] = useState([]);
+
+  useEffect(() => {
+    const onToggle = () => setShowNotifications(s => !s);
+    const onDocClick = () => setShowNotifications(false);
+    window.addEventListener('toggle-notifs', onToggle);
+    document.addEventListener('click', onDocClick);
+    return () => {
+      window.removeEventListener('toggle-notifs', onToggle);
+      document.removeEventListener('click', onDocClick);
+    };
+  }, []);
 
   /* ── On startup: check token → load history ── */
   useEffect(() => {
@@ -584,7 +679,7 @@ export default function App() {
               <button className="btn-link" onClick={() => setScoreboardMatch(h)}>📋 Scoreboard</button>
               <button style={{ background:"none", border:"none", color:"var(--c-faint)", cursor:"pointer", marginLeft:"auto", fontSize:16 }}
                 onClick={async () => {
-                  try { if (h._id) await deleteMatch(h._id); } catch(e) {}
+                  try { if (h._id) await deleteMatch(h._id); } catch (e) { console.error(e); }
                   setHistory(prev => prev.filter((_,idx) => idx !== i));
                 }}>🗑</button>
             </div>
@@ -716,31 +811,12 @@ export default function App() {
       case "match":    return <MatchContent />;
       case "analysis": return <Analysis innings={innings} t1Name={matchConfig.team1} t2Name={matchConfig.team2} isDesktop={isDesktop} history={history} />;
       case "history":  return <History history={history} isDesktop={isDesktop} onResume={resumeMatch} onScoreboard={setScoreboardMatch} onDelete={async (i, h) => {
-          try { if (h && h._id) await deleteMatch(h._id); } catch(e) {}
+          try { if (h && h._id) await deleteMatch(h._id); } catch (e) { console.error(e); }
           setHistory(prev => prev.filter((_,idx) => idx !== i));
         }} />;
       default:         return null;
     }
   };
-
-  const ResultBanner = ({ mobile = false }) =>
-    matchEnded && screen === "match"
-      ? <div className={`result-banner${mobile?" result-banner--mobile":""}`}>🏆 {matchStatus}</div>
-      : null;
-
-  const Modal = () => scoreboardMatch ? <HistoryScoreboardModal match={scoreboardMatch} onClose={() => setScoreboardMatch(null)} /> : null;
-
-  const LiveStatsOverlay = () => showLiveStats
-    ? <LiveStatsModal
-        innings={innings}
-        inn1BatName={inn1BatName}
-        inn1BowlName={inn1BowlName}
-        inn2BatName={inn2BatName}
-        inn2BowlName={inn2BowlName}
-        inn2Started={inn2Started}
-        onClose={() => setShowLiveStats(false)}
-      />
-    : null;
 
   /* ══ AUTH GATE ══ */
   if (authLoading) return (
@@ -750,31 +826,21 @@ export default function App() {
   );
   if (!currentUser) return <Auth onAuth={handleAuth} />;
 
-  /* ══ USER AVATAR — shown in all topbars ══ */
-  const UserBadge = () => (
-    <div style={{ display:"flex", alignItems:"center", gap:10 }}>
-      <div style={{
-        width:32, height:32, borderRadius:"50%",
-        background:"linear-gradient(135deg,#7c3aed,#a78bfa)",
-        display:"flex", alignItems:"center", justifyContent:"center",
-        color:"#fff", fontSize:12, fontWeight:800, flexShrink:0,
-      }}>{currentUser.avatar || currentUser.name.slice(0,2).toUpperCase()}</div>
-      <button
-        onClick={handleSignOut}
-        style={{
-          background:"rgba(239,68,68,0.15)", border:"1px solid rgba(239,68,68,0.3)",
-          color:"#fca5a5", borderRadius:8, padding:"5px 12px",
-          fontSize:12, fontWeight:700, cursor:"pointer",
-        }}
-      >Sign Out</button>
-    </div>
-  );
-
   /* ══ DESKTOP LAYOUT ══ */
   if (isDesktop) return (
     <div className="app-root">
-      <Modal />
-      <LiveStatsOverlay />
+      <NotificationsDropdown visible={showNotifications} history={history} onClose={() => setShowNotifications(false)} onResume={(h) => { resumeMatch(h); setShowNotifications(false); }} onOpenHistory={() => { goTo('history'); setShowNotifications(false); }} />
+      <Modal scoreboardMatch={scoreboardMatch} onClose={() => setScoreboardMatch(null)} />
+      <LiveStatsOverlay
+        showLiveStats={showLiveStats}
+        innings={innings}
+        inn1BatName={inn1BatName}
+        inn1BowlName={inn1BowlName}
+        inn2BatName={inn2BatName}
+        inn2BowlName={inn2BowlName}
+        inn2Started={inn2Started}
+        onClose={() => setShowLiveStats(false)}
+      />
       <aside className="sidebar">
         <div className="sidebar__brand">
           <div className="sidebar__logo">cric<span className="sidebar__logo-x">X</span></div>
@@ -799,10 +865,10 @@ export default function App() {
           </div>
           <div className="topbar__actions">
             {screen==="match" && <><IconBtn onClick={() => setScreen("analysis")}>📈 Analysis</IconBtn><IconBtn>↗ Share</IconBtn></>}
-            <UserBadge />
+            <UserBadge currentUser={currentUser} onSignOut={handleSignOut} history={history} onResume={resumeMatch} onOpenHistory={() => goTo('history')} />
           </div>
         </div>
-        <ResultBanner />
+        <ResultBanner matchEnded={matchEnded} screen={screen} matchStatus={matchStatus} />
         <div className="content-area">{renderScreen()}</div>
       </div>
     </div>
@@ -811,8 +877,18 @@ export default function App() {
   /* ══ TABLET LAYOUT ══ */
   if (isTablet) return (
     <div className="app-root">
-      <Modal />
-      <LiveStatsOverlay />
+      <NotificationsDropdown visible={showNotifications} history={history} onClose={() => setShowNotifications(false)} onResume={(h) => { resumeMatch(h); setShowNotifications(false); }} onOpenHistory={() => { goTo('history'); setShowNotifications(false); }} />
+      <Modal scoreboardMatch={scoreboardMatch} onClose={() => setScoreboardMatch(null)} />
+      <LiveStatsOverlay
+        showLiveStats={showLiveStats}
+        innings={innings}
+        inn1BatName={inn1BatName}
+        inn1BowlName={inn1BowlName}
+        inn2BatName={inn2BatName}
+        inn2BowlName={inn2BowlName}
+        inn2Started={inn2Started}
+        onClose={() => setShowLiveStats(false)}
+      />
       <aside className="sidebar-compact">
         <div className="sidebar-compact__logo">cX</div>
         {NAV_ITEMS.map(item => (
@@ -824,10 +900,10 @@ export default function App() {
           <span className="topbar__title" style={{ fontSize:17 }}>{pageTitle}</span>
           <div className="topbar__actions">
             {screen==="match" && <IconBtn onClick={() => setScreen("analysis")}>📈</IconBtn>}
-            <UserBadge />
+            <UserBadge currentUser={currentUser} onSignOut={handleSignOut} history={history} onResume={resumeMatch} onOpenHistory={() => goTo('history')} />
           </div>
         </div>
-        <ResultBanner />
+        <ResultBanner matchEnded={matchEnded} screen={screen} matchStatus={matchStatus} />
         <div className="content-area">{renderScreen()}</div>
       </div>
     </div>
@@ -836,8 +912,18 @@ export default function App() {
   /* ══ MOBILE LAYOUT ══ */
   return (
     <div className="layout-mobile">
-      <Modal />
-      <LiveStatsOverlay />
+      <NotificationsDropdown visible={showNotifications} history={history} onClose={() => setShowNotifications(false)} onResume={(h) => { resumeMatch(h); setShowNotifications(false); }} onOpenHistory={() => { goTo('history'); setShowNotifications(false); }} />
+      <Modal scoreboardMatch={scoreboardMatch} onClose={() => setScoreboardMatch(null)} />
+      <LiveStatsOverlay
+        showLiveStats={showLiveStats}
+        innings={innings}
+        inn1BatName={inn1BatName}
+        inn1BowlName={inn1BowlName}
+        inn2BatName={inn2BatName}
+        inn2BowlName={inn2BowlName}
+        inn2Started={inn2Started}
+        onClose={() => setShowLiveStats(false)}
+      />
       <header className="mobile-header">
         {screen==="home" ? (
           <span className="mobile-header__logo">cric<span className="mobile-header__logo-x">X</span><span className="mobile-header__scorer"> scorer</span></span>
@@ -846,12 +932,12 @@ export default function App() {
         )}
         {screen !== "home" && <span className="mobile-header__title">{pageTitle}</span>}
         <div className="mobile-header__actions">
-          {screen==="home"  && <UserBadge />}
+          {screen==="home"  && <UserBadge currentUser={currentUser} onSignOut={handleSignOut} history={history} onResume={resumeMatch} onOpenHistory={() => goTo('history')} />}
           {screen==="match" && <><IconBtn onClick={() => setScreen("analysis")}>📈</IconBtn><IconBtn>↗</IconBtn></>}
           {(screen==="setup"||screen==="history"||screen==="analysis") && <div style={{ width:40 }} />}
         </div>
       </header>
-      <ResultBanner mobile />
+      <ResultBanner mobile matchEnded={matchEnded} screen={screen} matchStatus={matchStatus} />
       <div className="content-area">{renderScreen()}</div>
       {(screen==="home"||screen==="history") && (
         <nav className="bottom-nav">

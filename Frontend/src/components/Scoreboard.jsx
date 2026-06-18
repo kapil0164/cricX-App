@@ -41,7 +41,7 @@ export function ScoreHero({ inn, inning, batName, target, runsNeeded, ballsLeft,
 }
 
 /* ─── Teams Bar ──────────────────────────────────────── */
-export function TeamsBar({ innings, t1Name, t2Name, currentInning, battingTeam, matchConfig, isDesktop, onStatsClick }) {
+export function TeamsBar({ innings, currentInning, battingTeam, matchConfig, isDesktop, onStatsClick }) {
   return (
     <div
       className={`teams-bar${onStatsClick ? " teams-bar--clickable" : ""}`}

@@ -130,6 +130,7 @@
   flex-direction: column;
   overflow: hidden;
   background: var(--c-bg);
+  position: relative; /* anchor absolute dropdowns inside main area */
 }
 
 /* ── TOP BAR (desktop / tablet) ── */
@@ -142,6 +143,9 @@
   justify-content: space-between;
   flex-shrink: 0;
   gap: 12px;
+  --topbar-height: 64px;
+  position: relative;
+  z-index: 1200;
 }
 
 .topbar--tablet { padding: 13px 20px; }
@@ -174,6 +178,9 @@
   justify-content: space-between;
   gap: 10px;
   flex-shrink: 0;
+  --topbar-height: 56px;
+  position: relative;
+  z-index: 1200;
 }
 
 .mobile-header__logo {
@@ -250,6 +257,7 @@
   display: flex;
   flex-direction: column;
   background: var(--c-bg);
+  padding-top: 12px;
 }
 
 /* ── SCROLL AREA ── */

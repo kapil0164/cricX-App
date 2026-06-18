@@ -1,14 +1,21 @@
 const router  = require('express').Router();
 const jwt     = require('jsonwebtoken');
 const User    = require('../models/User');
+const { validateEmail, validatePassword, validateName, sanitizeString } = require('../utils/validation');
 
-const JWT_SECRET  = process.env.JWT_SECRET || 'cricx_secret_change_in_prod';
+// ⚠️ JWT_SECRET is required - it will fail fast if not set
+const JWT_SECRET  = process.env.JWT_SECRET;
 const JWT_EXPIRES = '7d';
+
+if (!JWT_SECRET) {
+  throw new Error('CRITICAL: JWT_SECRET environment variable is not set');
+}
 
 // Helper — create and return signed token + user info
 function sendToken(user, statusCode, res) {
   const token = jwt.sign({ id: user._id }, JWT_SECRET, { expiresIn: JWT_EXPIRES });
   res.status(statusCode).json({
+    success: true,
     token,
     user: {
       _id:    user._id,
@@ -25,23 +32,43 @@ router.post('/signup', async (req, res) => {
     const { name, email, password } = req.body;
 
     // Validate fields
-    if (!name || !email || !password)
+    if (!name || !email || !password) {
       return res.status(400).json({ error: 'Name, email and password are required.' });
-    if (password.length < 6)
-      return res.status(400).json({ error: 'Password must be at least 6 characters.' });
+    }
+
+    if (!validateName(name)) {
+      return res.status(400).json({ error: 'Name must be 2-50 characters.' });
+    }
+
+    if (!validateEmail(email)) {
+      return res.status(400).json({ error: 'Invalid email format.' });
+    }
+
+    const passwordValidation = validatePassword(password);
+    if (!passwordValidation.valid) {
+      return res.status(400).json({ error: passwordValidation.error });
+    }
 
     // Check if email already exists
-    const existing = await User.findOne({ email });
-    if (existing)
+    const existing = await User.findOne({ email: email.toLowerCase() });
+    if (existing) {
       return res.status(409).json({ error: 'An account with this email already exists.' });
+    }
 
-    // Create user — password is hashed via pre-save hook in User.js
-    const avatar = name.slice(0, 2).toUpperCase();
-    const user   = await User.create({ name, email, password, avatar });
+    // Sanitize and create user
+    const sanitizedName = sanitizeString(name);
+    const avatar = sanitizedName.slice(0, 2).toUpperCase();
+    const user = await User.create({
+      name: sanitizedName,
+      email: email.toLowerCase(),
+      password,
+      avatar,
+    });
 
     sendToken(user, 201, res);
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    console.error('❌ Signup error:', err.message);
+    res.status(500).json({ error: 'Failed to create account. Please try again.' });
   }
 });
 
@@ -50,21 +77,29 @@ router.post('/signin', async (req, res) => {
   try {
     const { email, password } = req.body;
 
-    if (!email || !password)
+    if (!email || !password) {
       return res.status(400).json({ error: 'Email and password are required.' });
+    }
+
+    if (!validateEmail(email)) {
+      return res.status(400).json({ error: 'Invalid email format.' });
+    }
 
     // Find user (include password for comparison)
-    const user = await User.findOne({ email }).select('+password');
-    if (!user)
+    const user = await User.findOne({ email: email.toLowerCase() }).select('+password');
+    if (!user) {
       return res.status(401).json({ error: 'No account found with this email.' });
+    }
 
     const match = await user.matchPassword(password);
-    if (!match)
+    if (!match) {
       return res.status(401).json({ error: 'Incorrect password.' });
+    }
 
     sendToken(user, 200, res);
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    console.error('❌ Signin error:', err.message);
+    res.status(500).json({ error: 'Failed to sign in. Please try again.' });
   }
 });
 
@@ -72,17 +107,28 @@ router.post('/signin', async (req, res) => {
 router.get('/me', async (req, res) => {
   try {
     const authHeader = req.headers.authorization;
-    if (!authHeader || !authHeader.startsWith('Bearer '))
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
       return res.status(401).json({ error: 'No token provided.' });
+    }
 
-    const token   = authHeader.split(' ')[1];
-    const decoded = jwt.verify(token, JWT_SECRET);
-    const user    = await User.findById(decoded.id);
-    if (!user) return res.status(404).json({ error: 'User not found.' });
+    const token = authHeader.split(' ')[1];
 
-    res.json({ user });
+    let decoded;
+    try {
+      decoded = jwt.verify(token, JWT_SECRET);
+    } catch (jwtErr) {
+      return res.status(401).json({ error: 'Invalid or expired token.' });
+    }
+
+    const user = await User.findById(decoded.id);
+    if (!user) {
+      return res.status(404).json({ error: 'User not found.' });
+    }
+
+    res.json({ success: true, user });
   } catch (err) {
-    res.status(401).json({ error: 'Invalid or expired token.' });
+    console.error('❌ Auth check error:', err.message);
+    res.status(500).json({ error: 'Failed to verify token.' });
   }
 });
 

@@ -26,7 +26,7 @@ export default function MatchSetup({
 
   /* For number fields, store raw string while typing so the
      user can fully clear the field, then parse on blur */
-  const updNum = (k, raw, min, fallback) => {
+  const updNum = (k, raw) => {
     // Allow the field to show whatever the user types (including empty)
     upd(k, raw);
   };

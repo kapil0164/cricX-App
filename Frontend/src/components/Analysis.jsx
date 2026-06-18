@@ -158,6 +158,58 @@ function MatchAnalysis({ inn1, inn2, t1Name, t2Name, isDesktop }) {
   );
 }
 
+function AnalysisMatchPicker({ completed, isLive, selected, onSelectLive, onSelectHistory, t1Name, t2Name }) {
+  return (
+    <div className="analysis-picker">
+      <button
+        className={`analysis-picker__btn${isLive ? " active" : ""}`}
+        onClick={onSelectLive}
+      >
+        <span className="analysis-picker__icon">🏏</span>
+        <div>
+          <div className="analysis-picker__label">Live Match</div>
+          <div className="analysis-picker__sub">{t1Name} vs {t2Name}</div>
+        </div>
+      </button>
+
+      {completed.map((h, i) => (
+        <button
+          key={i}
+          className={`analysis-picker__btn${selected === String(i) ? " active" : ""}`}
+          onClick={() => onSelectHistory(i)}
+        >
+          <span className="analysis-picker__icon">🏆</span>
+          <div>
+            <div className="analysis-picker__label">{h.team1} vs {h.team2}</div>
+            <div className="analysis-picker__sub">{h.date} · {h.status?.slice(0,28)}{h.status?.length > 28 ? "…" : ""}</div>
+          </div>
+        </button>
+      ))}
+
+      {completed.length === 0 && (
+        <div className="analysis-picker__empty">No completed matches yet</div>
+      )}
+    </div>
+  );
+}
+
+function AnalysisContent({ displayStatus, displayInn1, displayInn2, displayT1, displayT2, isDesktop }) {
+  return (
+    <div>
+      {displayStatus && (
+        <div className="analysis-result-banner">🏆 {displayStatus}</div>
+      )}
+      <MatchAnalysis
+        inn1={displayInn1}
+        inn2={displayInn2}
+        t1Name={displayT1}
+        t2Name={displayT2}
+        isDesktop={isDesktop}
+      />
+    </div>
+  );
+}
+
 /* ─── Main export ────────────────────────────────────── */
 export default function Analysis({ innings, t1Name, t2Name, isDesktop, history = [] }) {
   // "live" = current match, or index into history array
@@ -179,58 +231,6 @@ export default function Analysis({ innings, t1Name, t2Name, isDesktop, history =
   const displayT2    = isLive ? t2Name           : (histMatch?.team2 || "Team 2");
   const displayStatus = isLive ? null            : histMatch?.status;
 
-  /* ── Match picker ── */
-  const MatchPicker = () => (
-    <div className="analysis-picker">
-      {/* Live match option */}
-      <button
-        className={`analysis-picker__btn${isLive ? " active" : ""}`}
-        onClick={() => setSelected("live")}
-      >
-        <span className="analysis-picker__icon">🏏</span>
-        <div>
-          <div className="analysis-picker__label">Live Match</div>
-          <div className="analysis-picker__sub">{t1Name} vs {t2Name}</div>
-        </div>
-      </button>
-
-      {/* Completed matches */}
-      {completed.map((h, i) => (
-        <button
-          key={i}
-          className={`analysis-picker__btn${selected === String(i) ? " active" : ""}`}
-          onClick={() => setSelected(String(i))}
-        >
-          <span className="analysis-picker__icon">🏆</span>
-          <div>
-            <div className="analysis-picker__label">{h.team1} vs {h.team2}</div>
-            <div className="analysis-picker__sub">{h.date} · {h.status?.slice(0,28)}{h.status?.length > 28 ? "…" : ""}</div>
-          </div>
-        </button>
-      ))}
-
-      {completed.length === 0 && (
-        <div className="analysis-picker__empty">No completed matches yet</div>
-      )}
-    </div>
-  );
-
-  const Content = () => (
-    <div>
-      {/* Result banner for history matches */}
-      {displayStatus && (
-        <div className="analysis-result-banner">🏆 {displayStatus}</div>
-      )}
-      <MatchAnalysis
-        inn1={displayInn1}
-        inn2={displayInn2}
-        t1Name={displayT1}
-        t2Name={displayT2}
-        isDesktop={isDesktop}
-      />
-    </div>
-  );
-
   if (isDesktop) {
     return (
       <div className="analysis-layout">
@@ -238,11 +238,26 @@ export default function Analysis({ innings, t1Name, t2Name, isDesktop, history =
           {/* Left: match picker */}
           <div className="analysis-desktop-sidebar">
             <div className="sec-title" style={{ marginBottom: 12 }}>Select Match</div>
-            <MatchPicker />
+            <AnalysisMatchPicker
+              completed={completed}
+              isLive={isLive}
+              selected={selected}
+              onSelectLive={() => setSelected("live")}
+              onSelectHistory={index => setSelected(String(index))}
+              t1Name={t1Name}
+              t2Name={t2Name}
+            />
           </div>
           {/* Right: analysis content */}
           <div className="analysis-desktop-main">
-            <Content />
+            <AnalysisContent
+              displayStatus={displayStatus}
+              displayInn1={displayInn1}
+              displayInn2={displayInn2}
+              displayT1={displayT1}
+              displayT2={displayT2}
+              isDesktop={isDesktop}
+            />
           </div>
         </div>
       </div>
@@ -253,9 +268,24 @@ export default function Analysis({ innings, t1Name, t2Name, isDesktop, history =
     <div className="analysis-layout--mobile">
       {/* Horizontal scroll picker on mobile */}
       <div className="sec-title" style={{ marginBottom: 8 }}>Select Match</div>
-      <MatchPicker />
+      <AnalysisMatchPicker
+        completed={completed}
+        isLive={isLive}
+        selected={selected}
+        onSelectLive={() => setSelected("live")}
+        onSelectHistory={index => setSelected(String(index))}
+        t1Name={t1Name}
+        t2Name={t2Name}
+      />
       <div style={{ marginTop: 12 }}>
-        <Content />
+        <AnalysisContent
+          displayStatus={displayStatus}
+          displayInn1={displayInn1}
+          displayInn2={displayInn2}
+          displayT1={displayT1}
+          displayT2={displayT2}
+          isDesktop={isDesktop}
+        />
       </div>
     </div>
   );

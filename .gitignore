@@ -1,0 +1,53 @@
+# Dependencies
+node_modules/
+
+# Environment variables
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Build folders
+build/
+dist/
+
+# Cache
+.cache/
+.parcel-cache/
+
+# Coverage
+coverage/
+
+# Operating System files
+.DS_Store
+Thumbs.db
+
+# IDE / Editor files
+.vscode/
+.idea/
+
+# Temporary files
+tmp/
+temp/
+
+# Vercel
+.vercel/
+
+# Render
+.render/
+
+# MongoDB local files
+data/
+*.mongodb
+
+# Optional lock files (keep if needed)
+package-lock.json
+yarn.lock
