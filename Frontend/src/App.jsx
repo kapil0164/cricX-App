@@ -135,10 +135,11 @@ function HistoryScoreboardModal({ match, onClose }) {
             color:"#5c35c4", fontWeight:700, fontSize:14, marginBottom:16,
           }}>🏆 {match.status}</div>
 
+          {/* Man of the Match */}
           {match.manOfTheMatch && (
             <div style={{
               background:"rgba(92,53,196,0.08)", borderRadius:12, padding:"12px 14px",
-              marginBottom:14, border:"1px solid rgba(92,53,196,0.12)",
+              marginBottom:16, border:"1px solid rgba(92,53,196,0.12)",
             }}>
               <div style={{ fontSize:12, fontWeight:700, color:"#341f69", marginBottom:6 }}>🏅 Man of the Match</div>
               <div style={{ fontSize:15, fontWeight:800, color:"#1a1530" }}>{match.manOfTheMatch.name}</div>
@@ -920,7 +921,7 @@ export default function App() {
           </div>
         </div>
         <ResultBanner matchEnded={matchEnded} screen={screen} matchStatus={matchStatus} />
-        {matchEnded && manOfTheMatch && <PerformerCard performer={manOfTheMatch} />}
+        {screen === "match" && matchEnded && manOfTheMatch && <PerformerCard performer={manOfTheMatch} />}
         <div className="content-area">{renderScreen()}</div>
       </div>
     </div>
@@ -956,7 +957,7 @@ export default function App() {
           </div>
         </div>
         <ResultBanner matchEnded={matchEnded} screen={screen} matchStatus={matchStatus} />
-        {matchEnded && manOfTheMatch && <PerformerCard performer={manOfTheMatch} />}
+        {screen === "match" && matchEnded && manOfTheMatch && <PerformerCard performer={manOfTheMatch} />}
         <div className="content-area">{renderScreen()}</div>
       </div>
     </div>
@@ -991,7 +992,7 @@ export default function App() {
         </div>
       </header>
       <ResultBanner mobile matchEnded={matchEnded} screen={screen} matchStatus={matchStatus} />
-      {matchEnded && manOfTheMatch && <PerformerCard performer={manOfTheMatch} />}
+      {screen === "match" && matchEnded && manOfTheMatch && <PerformerCard performer={manOfTheMatch} />}
       <div className="content-area">{renderScreen()}</div>
       {(screen==="home"||screen==="history") && (
         <nav className="bottom-nav">

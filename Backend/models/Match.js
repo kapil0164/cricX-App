@@ -61,23 +61,6 @@ const matchSchema = new mongoose.Schema(
       tossWon:        { type: String, default: 'team1' },
       optedTo:        { type: String, default: 'bat' },
     },
-    manOfTheMatch: {
-      name:          { type: String, default: '' },
-      team:          { type: String, default: '' },
-      role:          { type: String, default: '' },
-      runs:          { type: Number, default: 0 },
-      balls:         { type: Number, default: 0 },
-      fours:         { type: Number, default: 0 },
-      sixes:         { type: Number, default: 0 },
-      wickets:       { type: Number, default: 0 },
-      overs:         { type: Number, default: 0 },
-      maidens:       { type: Number, default: 0 },
-      runsConceded:  { type: Number, default: 0 },
-      strikeRate:    { type: String, default: '' },
-      economy:       { type: String, default: '' },
-      summary:       { type: String, default: '' },
-      performanceScore: { type: Number, default: 0 },
-    },
   },
   { timestamps: true }
 );
