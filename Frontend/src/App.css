@@ -250,6 +250,89 @@
   text-align: center;
 }
 
+.performer-card {
+  background: linear-gradient(180deg, #ffffff, #f7f3ff);
+  border: 1px solid rgba(92,53,196,0.15);
+  border-radius: 20px;
+  padding: 18px 20px;
+  margin: 12px 24px 0;
+  box-shadow: 0 16px 40px rgba(92,53,196,0.08);
+}
+
+.performer-card__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 16px;
+  margin-bottom: 14px;
+}
+
+.performer-card__label {
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #6d4b9d;
+  margin-bottom: 4px;
+}
+
+.performer-card__name {
+  font-size: 20px;
+  font-weight: 900;
+  color: #271b4a;
+}
+
+.performer-card__team {
+  font-size: 13px;
+  color: #6c5ecf;
+  margin-top: 3px;
+}
+
+.performer-card__badge {
+  padding: 6px 12px;
+  border-radius: 999px;
+  background: rgba(92,53,196,0.12);
+  color: #4f2eb7;
+  font-weight: 700;
+  font-size: 12px;
+  white-space: nowrap;
+}
+
+.performer-card__stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(90px, 1fr));
+  gap: 10px;
+  margin-bottom: 14px;
+}
+
+.performer-card__stats div {
+  background: rgba(92,53,196,0.06);
+  border-radius: 14px;
+  padding: 10px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.performer-card__stats span {
+  font-size: 11px;
+  color: #6d57a5;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.performer-card__stats strong {
+  font-size: 16px;
+  color: #1a1530;
+}
+
+.performer-card__summary {
+  color: #4f3b8d;
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.4;
+}
+
 /* ── CONTENT AREA ── */
 .content-area {
   flex: 1;

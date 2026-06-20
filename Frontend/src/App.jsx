@@ -3,7 +3,7 @@ import "./App.css";
 import "./styles/components.css";
 
 import { useWindowSize }  from "./hooks/useWindowSize";
-import { INIT_MATCH, INIT_EX, INIT_INN, mkBat, mkBowl, SAMPLE_HISTORY, ovD } from "./utils";
+import { INIT_MATCH, INIT_EX, INIT_INN, mkBat, mkBowl, SAMPLE_HISTORY, ovD, findManOfTheMatch, extractBestPerformances } from "./utils";
 
 import {
   ScoreHero, TeamsBar, ActivePlayers,
@@ -135,6 +135,18 @@ function HistoryScoreboardModal({ match, onClose }) {
             color:"#5c35c4", fontWeight:700, fontSize:14, marginBottom:16,
           }}>🏆 {match.status}</div>
 
+          {match.manOfTheMatch && (
+            <div style={{
+              background:"rgba(92,53,196,0.08)", borderRadius:12, padding:"12px 14px",
+              marginBottom:14, border:"1px solid rgba(92,53,196,0.12)",
+            }}>
+              <div style={{ fontSize:12, fontWeight:700, color:"#341f69", marginBottom:6 }}>🏅 Man of the Match</div>
+              <div style={{ fontSize:15, fontWeight:800, color:"#1a1530" }}>{match.manOfTheMatch.name}</div>
+              <div style={{ fontSize:12, color:"#6f64a1" }}>{match.manOfTheMatch.team} · {match.manOfTheMatch.role}</div>
+              <div style={{ marginTop:8, fontSize:12, color:"#534ea3" }}>{match.manOfTheMatch.summary}</div>
+            </div>
+          )}
+
           {innings.map(({ label, team, inn }, idx) => (
             <div key={idx} style={{ marginBottom:20 }}>
               {/* Innings header */}
@@ -234,6 +246,34 @@ function ResultBanner({ mobile = false, matchEnded, screen, matchStatus }) {
     : null;
 }
 
+function PerformerCard({ performer }) {
+  if (!performer) return null;
+  return (
+    <div className="performer-card">
+      <div className="performer-card__header">
+        <div>
+          <div className="performer-card__label">🏅 Man of the Match</div>
+          <div className="performer-card__name">{performer.name}</div>
+          <div className="performer-card__team">{performer.team} · {performer.role}</div>
+        </div>
+        <div className="performer-card__badge">Best Player</div>
+      </div>
+      <div className="performer-card__stats">
+        {performer.runs !== 0 && <div><span>Runs</span><strong>{performer.runs}</strong></div>}
+        {performer.balls !== 0 && <div><span>Balls</span><strong>{performer.balls}</strong></div>}
+        {performer.fours !== 0 && <div><span>4s</span><strong>{performer.fours}</strong></div>}
+        {performer.sixes !== 0 && <div><span>6s</span><strong>{performer.sixes}</strong></div>}
+        {performer.wickets !== 0 && <div><span>Wkts</span><strong>{performer.wickets}</strong></div>}
+        {performer.bowlBalls !== 0 && <div><span>Overs</span><strong>{performer.overs}.{performer.bowlBalls % 6}</strong></div>}
+        {performer.runsConceded !== 0 && <div><span>Runs</span><strong>{performer.runsConceded}</strong></div>}
+        {performer.strikeRate !== "0.00" && <div><span>SR</span><strong>{performer.strikeRate}</strong></div>}
+        {performer.economy !== "0.00" && <div><span>ER</span><strong>{performer.economy}</strong></div>}
+      </div>
+      <div className="performer-card__summary">{performer.summary}</div>
+    </div>
+  );
+}
+
 function Modal({ scoreboardMatch, onClose }) {
   return scoreboardMatch ? <HistoryScoreboardModal match={scoreboardMatch} onClose={onClose} /> : null;
 }
@@ -252,9 +292,8 @@ function LiveStatsOverlay({ showLiveStats, innings, inn1BatName, inn1BowlName, i
   ) : null;
 }
 
-function UserBadge({ currentUser, onSignOut, history = [], onResume, onOpenHistory }) {
+function UserBadge({ currentUser, onSignOut, history = [] }) {
   const savedCount = history.length;
-  const inProgressCount = history.filter(h => h.status && h.status.toLowerCase().includes("in progress")).length;
 
   return (
     <div style={{ display:"flex", alignItems:"center", gap:10, position:"relative" }}>
@@ -306,6 +345,7 @@ export default function App() {
   const [extras, setExtras]           = useState({ ...INIT_EX });
   const [matchStatus, setMatchStatus] = useState("");
   const [matchEnded, setMatchEnded]   = useState(false);
+  const [manOfTheMatch, setManOfTheMatch] = useState(null);
   const [runAnim, setRunAnim]         = useState(null);
   const [undoStack, setUndoStack]     = useState([]);
   const [matchStarted, setMatchStarted] = useState(false);
@@ -382,6 +422,7 @@ export default function App() {
     setInning(1);
     setMatchEnded(false);
     setMatchStatus("");
+    setManOfTheMatch(null);
     setCurrentOver([]);
     setExtras({ ...INIT_EX });
     setUndoStack([]);
@@ -433,6 +474,7 @@ export default function App() {
     setUndoStack([]);
     setMatchEnded(ended);
     setMatchStatus(ended ? (h.status || "") : "");
+    setManOfTheMatch(h.manOfTheMatch || null);
     setMatchStarted(true);
     setMatchTab("scoreboard");
     setScreen("match");
@@ -541,6 +583,7 @@ export default function App() {
   /* ══ CHECK INNINGS / MATCH END ══ */
   /* ══ SAVE IN-PROGRESS MATCH ══ */
   async function saveInProgress(li, curOver, curBattingTeam, curInning) {
+    const breakdown = extractBestPerformances(li, matchConfig.team1, matchConfig.team2, curBattingTeam ?? battingTeam);
     const snap = {
       _id:         currentMatchId,
       date:        new Date().toLocaleDateString("en-IN"),
@@ -554,6 +597,9 @@ export default function App() {
       inning:      curInning      ?? inning,
       matchConfig: { ...matchConfig },
       currentOver: Array.isArray(curOver) ? [...curOver] : [],
+      manOfTheMatch: null,
+      bestBatting: breakdown.bestBatting,
+      bestBowling: breakdown.bestBowling,
     };
     try {
       const saved = await saveMatch(snap);
@@ -597,7 +643,9 @@ export default function App() {
           : li[0].runs > cur.runs ? `${lName} won by ${li[0].runs - cur.runs} runs!`
           : cur.runs > li[0].runs ? `${wName} won!`
           : "Match tied!";
-        setMatchStatus(res); setMatchEnded(true);
+        const performer = findManOfTheMatch(li, matchConfig.team1, matchConfig.team2, battingTeam);
+        const breakdown = extractBestPerformances(li, matchConfig.team1, matchConfig.team2, battingTeam);
+        setMatchStatus(res); setMatchEnded(true); setManOfTheMatch(performer);
         saveMatch({
           _id: currentMatchId,
           date: new Date().toLocaleDateString("en-IN"),
@@ -606,6 +654,9 @@ export default function App() {
           inn1: safeInn(li[0]), inn2: safeInn(li[1]),
           status: res, battingTeam, inning: 2,
           matchConfig: { ...matchConfig }, currentOver: [],
+          manOfTheMatch: performer,
+          bestBatting: breakdown.bestBatting,
+          bestBowling: breakdown.bestBowling,
         }).then(saved => {
           setCurrentMatchId(saved._id);
           setHistory(prev => {
@@ -869,6 +920,7 @@ export default function App() {
           </div>
         </div>
         <ResultBanner matchEnded={matchEnded} screen={screen} matchStatus={matchStatus} />
+        {matchEnded && manOfTheMatch && <PerformerCard performer={manOfTheMatch} />}
         <div className="content-area">{renderScreen()}</div>
       </div>
     </div>
@@ -904,6 +956,7 @@ export default function App() {
           </div>
         </div>
         <ResultBanner matchEnded={matchEnded} screen={screen} matchStatus={matchStatus} />
+        {matchEnded && manOfTheMatch && <PerformerCard performer={manOfTheMatch} />}
         <div className="content-area">{renderScreen()}</div>
       </div>
     </div>
@@ -938,6 +991,7 @@ export default function App() {
         </div>
       </header>
       <ResultBanner mobile matchEnded={matchEnded} screen={screen} matchStatus={matchStatus} />
+      {matchEnded && manOfTheMatch && <PerformerCard performer={manOfTheMatch} />}
       <div className="content-area">{renderScreen()}</div>
       {(screen==="home"||screen==="history") && (
         <nav className="bottom-nav">
